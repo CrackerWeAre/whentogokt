@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "288478016628",
+    "firebase_url": "https://whentogo-9bbfe.firebaseio.com",
+    "project_id": "whentogo-9bbfe",
+    "storage_bucket": "whentogo-9bbfe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288478016628:android:e7cc5547c526403b0b8d21",
+        "android_client_info": {
+          "package_name": "com.example.whentogokt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288478016628-r9ngco7f86eg3f07kf87l2vhdub2guaj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.whentogokt",
+            "certificate_hash": "2017233e9dd6d78b52de52d550c5423db16228f4"
+          }
+        },
+        {
+          "client_id": "288478016628-rn0g0cbaa3abfbdqqjaqvdb5papspe20.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-wNNyel-rLJiDxysMojzEoWJjXkefFG0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288478016628-rn0g0cbaa3abfbdqqjaqvdb5papspe20.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
