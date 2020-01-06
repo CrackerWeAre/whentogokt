@@ -1,7 +1,9 @@
 package com.example.whentogokt
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.os.SystemClock
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 
@@ -28,7 +30,6 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_emailpassword)
-
         setProgressBar(R.id.progressBar)
 
         // Buttons
@@ -44,7 +45,16 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
     override fun onStart() {
         super.onStart()
         val currentUser = mAuth.currentUser
+
         updateUI(currentUser)
+
+        showProgressBar()
+
+        if (currentUser!!.isEmailVerified) {
+            val intent = Intent(this, SearchActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
 
     }
 
@@ -88,7 +98,13 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmail:success")
                     val user = mAuth.currentUser
+
                     updateUI(user)
+
+                    val intent = Intent(this, SearchActivity::class.java)
+                    startActivity(intent)
+                    finish()
+
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
