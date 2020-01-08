@@ -106,6 +106,6 @@
 
     <string name="error_sign_in_failed">Sign in failed, see logs for details.</string>
     <string name="title_activity_search">SearchActivity</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_1">When to go</string>
+    <string name="tab_text_2">Settings</string>
 </resources>
