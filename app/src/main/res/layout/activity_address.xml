@@ -10,15 +10,12 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:weightSum="5"
-    tools:context=".SearchAddress">
+    tools:context=".SearchAddressActivity">
 
     <WebView
-        android:id="@+id/webView_address"
+        android:id="@+id/daum_webview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/txt_address"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="받은 주소" />
+        android:layout_height="450dp"
+        android:layout_weight="0" />
+
 </LinearLayout>

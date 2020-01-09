@@ -48,13 +48,9 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
 
         updateUI(currentUser)
 
-        showProgressBar()
-
-        if (currentUser!!.isEmailVerified) {
-            val intent = Intent(this, SearchActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
+        val intent = Intent(this, SearchActivity::class.java)
+        startActivity(intent)
+        finish()
 
     }
 
