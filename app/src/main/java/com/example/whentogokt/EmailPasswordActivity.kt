@@ -48,29 +48,27 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
 
         updateUI(currentUser)
 
-        val intent = Intent(this, SearchActivity::class.java)
-        startActivity(intent)
-        finish()
+        // 이미 로그인 되어있다면
+        if ((currentUser?.isEmailVerified == true) && currentUser != null){
+            val intent = Intent(this, Main2Activity::class.java)
+            startActivity(intent)
+            finish()
+        }
 
     }
 
     private fun createAccount(email: String, password: String) {
-        Log.d(TAG, "createAccount:$email")
-        if (!validateForm()){
-            return
-        }
+        if (!validateForm()) {return}
 
         showProgressBar()
 
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this){ task ->
             if (task.isSuccessful){
-                // Sign in success, update UI with the signed-in user's information
-                Log.d(TAG, "createUserWithEmail:success")
+                // 가입이 성공하면 업데이트 된 유저 접속
                 val user = mAuth.currentUser
                 updateUI(user)
             } else {
-                // If sign in fails, display a message to the user
-                Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                // 가입이 실패하면 가입 실패 메세지를 보여줌
                 Toast.makeText(baseContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
                 updateUI(null)
             }
@@ -81,34 +79,30 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun signIn(email: String, password: String){
-        Log.d(TAG, "signIn:$email")
-        if (!validateForm()) {
-            return
-        }
+        if (!validateForm()) {return}
 
         showProgressBar()
 
-        mAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
+                    // 로그인이 성공하면 다음 Activity로 이동
                     Log.d(TAG, "signInWithEmail:success")
                     val user = mAuth.currentUser
 
                     updateUI(user)
 
-                    val intent = Intent(this, SearchActivity::class.java)
+                    val intent = Intent(this, Main2Activity::class.java)
                     startActivity(intent)
                     finish()
 
                 } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithEmail:failure", task.exception)
+                    // 로그인 실패
                     Toast.makeText(baseContext, "Authentication failed.",
                         Toast.LENGTH_SHORT).show()
                     updateUI(null)
                 }
 
+                // 인증 실패
                 if (!task.isSuccessful) {
                     status.setText(R.string.auth_failed)
                 }
@@ -117,6 +111,7 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun signOut() {
+        // 로그아웃
         mAuth.signOut()
         updateUI(null)
     }
@@ -128,20 +123,18 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
         // Send verification email
         // [START send_email_verification]
         val user = mAuth.currentUser
-        user?.sendEmailVerification()
-            ?.addOnCompleteListener(this) { task ->
+        user?.sendEmailVerification()?.addOnCompleteListener(this) { task ->
                 // [START_EXCLUDE]
                 // Re-enable button
                 verifyEmailButton.isEnabled = true
 
                 if (task.isSuccessful) {
                     Toast.makeText(baseContext,
-                        "Verification email sent to ${user.email} ",
+                        "인증 메일이 발송 되었습니다.${user.email}",
                         Toast.LENGTH_SHORT).show()
                 } else {
-                    Log.e(TAG, "sendEmailVerification", task.exception)
                     Toast.makeText(baseContext,
-                        "Failed to send verification email.",
+                        "인증이 실패하였습니다.",
                         Toast.LENGTH_SHORT).show()
                 }
                 // [END_EXCLUDE]
@@ -151,10 +144,10 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
 
     private fun validateForm(): Boolean {
         var valid = true
-
         val email = fieldEmail.text.toString()
+
         if (TextUtils.isEmpty(email)) {
-            fieldEmail.error = "Required."
+            fieldEmail.error = "이메일을 작성해 주세요."
             valid = false
         } else {
             fieldEmail.error = null
@@ -162,7 +155,7 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
 
         val password = fieldPassword.text.toString()
         if (TextUtils.isEmpty(password)) {
-            fieldPassword.error = "Required."
+            fieldPassword.error = "비밀번호를 작성해 주세요."
             valid = false
         } else {
             fieldPassword.error = null
@@ -174,8 +167,7 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
     private fun updateUI(user: FirebaseUser?) {
         hideProgressBar()
         if (user != null) {
-            status.text = getString(R.string.emailpassword_status_fmt,
-                user.email, user.isEmailVerified)
+            status.text = getString(R.string.emailpassword_status_fmt, user.email, user.isEmailVerified)
             detail.text = getString(R.string.firebase_status_fmt, user.uid)
 
             emailPasswordButtons.visibility = View.GONE

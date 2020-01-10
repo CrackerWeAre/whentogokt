@@ -38,7 +38,6 @@ class SearchAddressActivity : AppCompatActivity() {
         // web client 를 chrome 으로 설정
         webView!!.setWebChromeClient(WebChromeClient())
         // webview url load. php 파일 주소
-        //webView!!.loadUrl("http://10.0.75.1:8080/daumwebview.html")
         webView!!.loadUrl("http://10.0.75.1:8080/postcode.v2.html")
     }
 
