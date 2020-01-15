@@ -2,8 +2,6 @@ package com.example.whentogokt
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.os.SystemClock
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 
@@ -50,7 +48,7 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
 
         // 이미 로그인 되어있다면
         if ((currentUser?.isEmailVerified == true) && currentUser != null){
-            val intent = Intent(this, Main2Activity::class.java)
+            val intent = Intent(this, Main3Activity::class.java)
             startActivity(intent)
             finish()
         }
@@ -91,7 +89,7 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
 
                     updateUI(user)
 
-                    val intent = Intent(this, Main2Activity::class.java)
+                    val intent = Intent(this, Main3Activity::class.java)
                     startActivity(intent)
                     finish()
 

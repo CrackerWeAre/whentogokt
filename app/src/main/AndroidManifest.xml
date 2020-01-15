@@ -15,27 +15,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity
-            android:name=".Main2Activity"
-            android:label="@string/title_activity_main2"></activity>
-        <!-- Splash -->
+        <activity android:name=".ResultActivity"></activity>
+        <activity android:name=".Main3Activity" /> <!-- Splash -->
         <activity
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity> <!-- Login -->
         <activity
             android:name=".EmailPasswordActivity"
             android:label="@string/label_emailpassword"
-            android:windowSoftInputMode="stateAlwaysHidden" /> <!-- Search -->
-        <activity
-            android:name=".SearchActivity"
-            android:label="@string/title_activity_search"
-            android:theme="@style/AppTheme.NoActionBar" /> <!-- Daum -->
+            android:windowSoftInputMode="stateAlwaysHidden" /> <!-- Daum -->
         <activity android:name=".SearchAddressActivity" /> <!-- Main -->
         <activity android:name=".MainActivity" />
     </application>
