@@ -12,48 +12,35 @@ import android.location.Geocoder
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.provider.Settings
-import android.view.MotionEvent
+import android.util.Log
 import android.view.View
-import android.webkit.JavascriptInterface
-import android.webkit.WebChromeClient
-import android.webkit.WebView
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.whentogokt.Retrofit.OdsayAPI
+import com.example.whentogokt.Model.APIResponseModel
+import com.example.whentogokt.Utils.GpsTracker
 import com.odsay.odsayandroidsdk.API
 import com.odsay.odsayandroidsdk.ODsayData
-import com.odsay.odsayandroidsdk.ODsayService
 import com.odsay.odsayandroidsdk.OnResultCallbackListener
-import kotlinx.android.synthetic.main.activity_main.*
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_home.*
 import org.json.JSONObject
 import java.io.IOException
 import java.util.*
 
-class Main3Activity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
 
+    lateinit var compositeDisposable: CompositeDisposable
     private var gpsTracker: GpsTracker? = null
     private var textView_Date: TextView? = null
     private var textView_Time: TextView? = null
     private var dateCallbackMethod: DatePickerDialog.OnDateSetListener? = null
     private var timeCallbackMethod: TimePickerDialog.OnTimeSetListener? = null
-
-    private var sp_api: Spinner? = null
-    private var rg_object_type: RadioGroup? = null
-    private var rb_json: RadioButton? = null
-    private var rb_map: RadioButton? = null
-    private var bt_api_call: Button? = null
-    private var tv_data: TextView? = null
-    private var context: Context? = null
-    private var spinnerSelectedName: String? = null
-    private var odsayService: ODsayService? = null
-    private var jsonObject: JSONObject? = null
-    private var mapObject: Map<*, *>? = null
-
-    private var webView: WebView? = null
-    private var handler: Handler? = null
 
     var latitude: Double = 0.0
     var longitude: Double = 0.0
@@ -65,13 +52,11 @@ class Main3Activity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main3)
+        setContentView(R.layout.activity_home)
 
-        val dateButton : Button = findViewById(R.id.btn_date)
         val timeButton : Button = findViewById(R.id.btn_time)
 
         // GPS 정보 입력
-        val textview_address = findViewById<View>(R.id.tv_gps) as TextView
         val ShowLocationButton: Button = findViewById<View>(R.id.btn_gps) as Button
 
         // 위치서비스 체크
@@ -81,34 +66,34 @@ class Main3Activity : AppCompatActivity() {
             checkRunTimePermission()
         }
 
+        // 현재 GPS/주소
+        gpsTracker = GpsTracker(this@HomeActivity)
+        latitude = gpsTracker!!.getLatitude()
+        longitude = gpsTracker!!.getLongitude()
+        val address = getCurrentAddress(latitude, longitude)
+
+        // Daum 도로명주소 api
         ShowLocationButton.setOnClickListener(View.OnClickListener {
-            gpsTracker = GpsTracker(this@Main3Activity)
-            latitude = gpsTracker!!.getLatitude()
-            longitude = gpsTracker!!.getLongitude()
-            val address = getCurrentAddress(latitude, longitude)
-            textview_address.text = address
+            val intent = Intent(this, DaumWebViewActivity::class.java)
+            startActivity(intent)
+            finish()
+
+            // TODO : intent 넘기기
+            var arg1 : String = intent.getStringExtra("arg1")
+            var arg2 : String = intent.getStringExtra("arg2")
+            var arg3 : String = intent.getStringExtra("arg3")
+
+            tv_gps.setText(String.format("(%s) %s %s", arg1, arg2, arg3))
         })
 
         // Timezone 설정
         val tz = TimeZone.getTimeZone("Asia/Seoul")
         val gc = GregorianCalendar(tz)
 
-        // 현재 날짜 입력
-        var year = gc.get(GregorianCalendar.YEAR).toString()
-        var month = gc.get(GregorianCalendar.MONTH).toString()
-        var day = gc.get(GregorianCalendar.DATE).toString()
-
-        InitializeDateView()
-        InitializeDateListener()
-        dateButton.setOnClickListener( View.OnClickListener {
-            val dialog = DatePickerDialog(this, dateCallbackMethod, year.toInt(), month.toInt(), day.toInt())
-            dialog.show()
-        })
-
         var hour= gc.get(GregorianCalendar.HOUR).toString()
         var min = gc.get(GregorianCalendar.MINUTE).toString()
 
-        // 현재 시간 입력
+        // 도착 시간 입력
         InitializeTimeView()
         InitializeTimeListener()
         timeButton.setOnClickListener( View.OnClickListener {
@@ -117,21 +102,9 @@ class Main3Activity : AppCompatActivity() {
         })
 
         // API 호출 관련 Initialization
-        context = this
-        //sp_api = findViewById(R.id.sp_api) as Spinner?
-        rg_object_type = findViewById(R.id.rg_object_type) as RadioGroup?
-        bt_api_call = findViewById(R.id.bt_api_call) as Button?
-        rb_json = findViewById(R.id.rb_json) as RadioButton?
-        rb_map = findViewById(R.id.rb_map) as RadioButton?
-        tv_data = findViewById(R.id.tv_data) as TextView?
-        //sp_api!!.setSelection(0)
-
-        odsayService = ODsayService.init(this@Main3Activity, getString(R.string.odsay_key))
-        odsayService?.setReadTimeout(5000)  // 서버연결 제한시간
-        odsayService?.setConnectionTimeout(5000) // 데이터획득 제한시간
+        compositeDisposable = CompositeDisposable()
 
         // 검색 버튼 클릭
-
         var button_click : Button = findViewById(R.id.btn_search)
 
         button_click.setOnClickListener( View.OnClickListener {
@@ -144,58 +117,52 @@ class Main3Activity : AppCompatActivity() {
 
             // 모든 정보가 유효하다면
             // api 호출
-            var SX = 127.03884584921066
-            var SY = 37.56460329171426
-            var EX = 127.05675385527476
-            var EY = 37.50724735841729
-            odsayService?.requestSearchPubTransPath(
-                    SX.toString(),
-                    SY.toString(),
-                    EX.toString(),
-                    EY.toString(),
-                    "0",
-                    "0",
-                    "0",
-            onResultCallbackListener
-            )
 
-            val intent = Intent(this, ResultActivity::class.java)
-            startActivity(intent)
-            intent.putExtra("result_json", jsonObject.toString())
-            finish()
+            // 임시 파라미터
+            var sx = 127.03884584921066
+            var sy = 37.56460329171426
+            var ex = 127.05675385527476
+            var ey = 37.50724735841729
+            var opt = 0
+            var SearchType = 0
+            var SearchPathType = 0
+
+            val jsonParam = JSONObject()
+
+            jsonParam?.put("sx", sx.toString())
+            jsonParam?.put("sy", sy.toString())
+            jsonParam?.put("ex", ex.toString())
+            jsonParam?.put("ey", ey.toString())
+            jsonParam?.put("opt", opt.toString())
+            jsonParam?.put("SearchType", SearchType.toString())
+            jsonParam?.put("SearchPathType", SearchPathType.toString())
+
+            compositeDisposable.add(OdsayAPI.getRepoList(jsonParam)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe({ response: APIResponseModel ->
+                    var idx = 0
+                    for (item in response.resultList) {
+                        idx++
+                        println("index " +idx)
+                        println(item.totaltime)
+                        for (i in item.subPath){
+                            println(i.sectionTime)
+                            println(i.endName)
+                            println(i.name)
+                            println(i.startName)
+                        }
+                    }
+
+                    // TODO : SelectActivity로 넘어가기
+
+                }, { error: Throwable ->
+                    Log.d("MainActivity", error.localizedMessage)
+                    Toast.makeText(this, "Error ${error.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }))
         })
 
     }
-
-    private val onResultCallbackListener: OnResultCallbackListener =
-        object : OnResultCallbackListener {
-            override fun onSuccess(oDsayData: ODsayData, api: API) {
-                jsonObject = oDsayData.json
-                mapObject = oDsayData.map
-
-                if (rg_object_type!!.checkedRadioButtonId == rb_json!!.id) {
-                    if (jsonObject == null){
-                        tv_data!!.text = "정보가없습니다."
-                    }
-
-                    tv_data!!.text = jsonObject.toString()
-
-                } else if (rg_object_type!!.checkedRadioButtonId == rb_map!!.id) {
-                    if (mapObject == null){
-                        tv_data!!.text = "정보가없습니다."
-                    }
-                    tv_data!!.text = mapObject.toString()
-                }
-            }
-
-            override fun onError(
-                i: Int,
-                errorMessage: String,
-                api: API
-            ) {
-                tv_data!!.text = "API : " + api.name + "\n" + errorMessage
-            }
-        }
 
     // ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드
     override fun onRequestPermissionsResult(permsRequestCode: Int, permissions: Array<String>, grandResults: IntArray) {
@@ -216,7 +183,7 @@ class Main3Activity : AppCompatActivity() {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0]) ||
                     ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
                     Toast.makeText(
-                        this@Main3Activity,
+                        this@HomeActivity,
                         "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요.",
                         Toast.LENGTH_LONG
                     ).show()
@@ -224,7 +191,7 @@ class Main3Activity : AppCompatActivity() {
                 }
                 else {
                     Toast.makeText(
-                        this@Main3Activity,
+                        this@HomeActivity,
                         "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ",
                         Toast.LENGTH_LONG
                     ).show()
@@ -235,8 +202,8 @@ class Main3Activity : AppCompatActivity() {
     //런타임 퍼미션 처리
     fun checkRunTimePermission() {
         // 1. 위치 퍼미션을 가지고 있는지 체크합니다.
-        val hasFineLocationPermission = ContextCompat.checkSelfPermission(this@Main3Activity, Manifest.permission.ACCESS_FINE_LOCATION)
-        val hasCoarseLocationPermission = ContextCompat.checkSelfPermission(this@Main3Activity, Manifest.permission.ACCESS_COARSE_LOCATION)
+        val hasFineLocationPermission = ContextCompat.checkSelfPermission(this@HomeActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+        val hasCoarseLocationPermission = ContextCompat.checkSelfPermission(this@HomeActivity, Manifest.permission.ACCESS_COARSE_LOCATION)
         // 2. 이미 퍼미션을 가지고 있다면
         // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식)
         // 위치 값을 가져올 수 있음
@@ -246,21 +213,21 @@ class Main3Activity : AppCompatActivity() {
         else {
             // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
             // 3-2. 요청을 진행하기 전에 사용자가에게 퍼미션이 필요한 이유를 설명해줄 필요가 있습니다.
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this@Main3Activity, REQUIRED_PERMISSIONS[0])) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this@HomeActivity, REQUIRED_PERMISSIONS[0])) {
                 Toast.makeText(
-                    this@Main3Activity,
+                    this@HomeActivity,
                     "이 앱을 실행하려면 위치 접근 권한이 필요합니다.",
                     Toast.LENGTH_LONG).show()
                 // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult 에서 수신
                 ActivityCompat.requestPermissions(
-                    this@Main3Activity, REQUIRED_PERMISSIONS,
+                    this@HomeActivity, REQUIRED_PERMISSIONS,
                     PERMISSIONS_REQUEST_CODE
                 )}
             // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 함
             // 요청 결과는 onRequestPermissionResult에서 수신
             else {
                 ActivityCompat.requestPermissions(
-                    this@Main3Activity, REQUIRED_PERMISSIONS,
+                    this@HomeActivity, REQUIRED_PERMISSIONS,
                     PERMISSIONS_REQUEST_CODE
                 )
             }
@@ -296,7 +263,7 @@ class Main3Activity : AppCompatActivity() {
 
     // GPS 활성화를 위한 메소드
     private fun showDialogForLocationServiceSetting() {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this@Main3Activity)
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this@HomeActivity)
         builder.setTitle("위치 서비스 비활성화")
         builder.setMessage(
             "앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n"
@@ -341,18 +308,6 @@ class Main3Activity : AppCompatActivity() {
         private const val PERMISSIONS_REQUEST_CODE = 100
     }
 
-    // Date Dialog Initialize
-    fun InitializeDateView() {
-        textView_Date = findViewById<View>(R.id.tv_date) as TextView
-    }
-
-    fun InitializeDateListener() {
-        dateCallbackMethod =
-            DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
-                textView_Date!!.text = year.toString() + "년" + monthOfYear + "월" + dayOfMonth + "일"
-            }
-    }
-
     fun InitializeTimeView() {
         textView_Time = findViewById<View>(R.id.tv_time) as TextView
     }
@@ -364,44 +319,9 @@ class Main3Activity : AppCompatActivity() {
             }
     }
 
-//    // Daum Webview
-//    fun init_webView() {
-//        webView = findViewById(R.id.wv_daum) as WebView?
-//        // JavaScript 허용
-//        webView!!.getSettings().setJavaScriptEnabled(true)
-//        // JavaScript의 window.open 허용
-//        webView!!.getSettings().setJavaScriptCanOpenWindowsAutomatically(true)
-//        // JavaScript이벤트에 대응할 함수를 정의 한 클래스를 붙여줌
-//        webView!!.addJavascriptInterface(AndroidBridge(), "TestApp")
-//        // web client 를 chrome 으로 설정
-//        webView!!.setWebChromeClient(WebChromeClient())
-//        // webview url load. php 파일 주소
-//        //webView!!.loadUrl("http://10.0.75.1:8080/postcode.v2.html")
-//        webView!!.loadUrl("http://naver.com")
-//    }
-//
-//    private inner class AndroidBridge {
-//        @JavascriptInterface
-//        fun setAddress(arg1: String?, arg2: String?, arg3: String?) {
-//            handler!!.post(Runnable {
-//                // WebView를 초기화 하지않으면 재사용할 수 없음
-//                init_webView()
-//
-//                val intent = Intent()
-//                intent.putExtra("address1", arg2)
-//                intent.putExtra("address_building", arg3)
-//                setResult(1, intent)
-//                finish()
-//
-//            })
-//        }
-//    }
-//
-//    override fun onTouchEvent(event: MotionEvent): Boolean { //바깥레이어 클릭시 안닫히게
-//        return if (event.action == MotionEvent.ACTION_OUTSIDE) {
-//            false
-//        } else true
-//    }
-
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
+    }
 
 }

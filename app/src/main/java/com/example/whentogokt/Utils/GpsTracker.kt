@@ -1,4 +1,4 @@
-package com.example.whentogokt
+package com.example.whentogokt.Utils
 
 import android.Manifest
 import android.app.Service

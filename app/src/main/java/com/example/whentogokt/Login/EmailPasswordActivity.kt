@@ -1,4 +1,4 @@
-package com.example.whentogokt
+package com.example.whentogokt.Login
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,18 +8,21 @@ import com.google.firebase.auth.FirebaseAuth
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import com.example.whentogokt.HomeActivity
+import com.example.whentogokt.Login.BaseActivity
+import com.example.whentogokt.R
 import com.google.firebase.auth.FirebaseUser
-import kotlinx.android.synthetic.main.activity_emailpassword.detail
-import kotlinx.android.synthetic.main.activity_emailpassword.emailCreateAccountButton
-import kotlinx.android.synthetic.main.activity_emailpassword.emailPasswordButtons
-import kotlinx.android.synthetic.main.activity_emailpassword.emailPasswordFields
-import kotlinx.android.synthetic.main.activity_emailpassword.emailSignInButton
-import kotlinx.android.synthetic.main.activity_emailpassword.fieldEmail
-import kotlinx.android.synthetic.main.activity_emailpassword.fieldPassword
-import kotlinx.android.synthetic.main.activity_emailpassword.signOutButton
-import kotlinx.android.synthetic.main.activity_emailpassword.signedInButtons
-import kotlinx.android.synthetic.main.activity_emailpassword.status
-import kotlinx.android.synthetic.main.activity_emailpassword.verifyEmailButton
+import kotlinx.android.synthetic.main.activity_login.detail
+import kotlinx.android.synthetic.main.activity_login.emailCreateAccountButton
+import kotlinx.android.synthetic.main.activity_login.emailPasswordButtons
+import kotlinx.android.synthetic.main.activity_login.emailPasswordFields
+import kotlinx.android.synthetic.main.activity_login.emailSignInButton
+import kotlinx.android.synthetic.main.activity_login.fieldEmail
+import kotlinx.android.synthetic.main.activity_login.fieldPassword
+import kotlinx.android.synthetic.main.activity_login.signOutButton
+import kotlinx.android.synthetic.main.activity_login.signedInButtons
+import kotlinx.android.synthetic.main.activity_login.status
+import kotlinx.android.synthetic.main.activity_login.verifyEmailButton
 
 class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
 
@@ -27,7 +30,7 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_emailpassword)
+        setContentView(R.layout.activity_login)
         setProgressBar(R.id.progressBar)
 
         // Buttons
@@ -47,8 +50,8 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
         updateUI(currentUser)
 
         // 이미 로그인 되어있다면
-        if ((currentUser?.isEmailVerified == true) && currentUser != null){
-            val intent = Intent(this, Main3Activity::class.java)
+        if (currentUser?.isEmailVerified == true){
+            val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             finish()
         }
@@ -89,7 +92,7 @@ class EmailPasswordActivity : BaseActivity(), View.OnClickListener {
 
                     updateUI(user)
 
-                    val intent = Intent(this, Main3Activity::class.java)
+                    val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
                     finish()
 

@@ -15,10 +15,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ResultActivity"></activity>
-        <activity android:name=".Main3Activity" /> <!-- Splash -->
+        <activity android:name=".OnTheWayActivity"></activity>
+        <activity android:name=".NoResultActivity" />
+        <activity android:name=".SelectActivity" />
+        <activity android:name=".WhentogoActivity" />
+        <activity android:name=".HomeActivity" /> <!-- Splash -->
         <activity
-            android:name=".SplashActivity"
+            android:name=".Utils.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,10 +29,10 @@
             </intent-filter>
         </activity> <!-- Login -->
         <activity
-            android:name=".EmailPasswordActivity"
+            android:name=".Login.EmailPasswordActivity"
             android:label="@string/label_emailpassword"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- Daum -->
-        <activity android:name=".SearchAddressActivity" /> <!-- Main -->
+        <activity android:name=".DaumWebViewActivity" /> <!-- Main -->
         <activity android:name=".MainActivity" />
     </application>
 

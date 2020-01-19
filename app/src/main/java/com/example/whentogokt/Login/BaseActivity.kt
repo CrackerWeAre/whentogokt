@@ -1,4 +1,4 @@
-package com.example.whentogokt
+package com.example.whentogokt.Login
 
 import android.content.Context
 import android.view.View

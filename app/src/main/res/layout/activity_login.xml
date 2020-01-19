@@ -1,4 +1,5 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
@@ -62,6 +63,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textColorHint="@color/white"
                 android:hint="@string/hint_email"
                 android:inputType="textEmailAddress" />
 
@@ -71,6 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/hint_password"
+                android:textColorHint="@color/white"
                 android:inputType="textPassword" />
         </LinearLayout>
 
@@ -85,6 +88,7 @@
 
             <Button
                 android:id="@+id/emailSignInButton"
+                style="@style/FirebaseUI.Button.AccountChooser.GoogleButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/button_horizontal_margin"
@@ -95,6 +99,7 @@
 
             <Button
                 android:id="@+id/emailCreateAccountButton"
+                style="@style/FirebaseUI.Button.AccountChooser.GoogleButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/button_horizontal_margin"
