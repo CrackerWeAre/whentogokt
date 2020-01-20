@@ -27,8 +27,8 @@
         android:id="@+id/btn_gps"
         android:layout_width="200dp"
         android:layout_height="40dp"
-        android:layout_marginTop="180dp"
-        android:text="어디로?"
+        android:layout_marginTop="332dp"
+        android:text="어디로 갈까요?"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -48,8 +48,8 @@
         android:id="@+id/btn_time"
         android:layout_width="200dp"
         android:layout_height="40dp"
-        android:layout_marginTop="192dp"
-        android:text="몇시까지"
+        android:layout_marginTop="336dp"
+        android:text="몇시까지 갈까요?"
         app:layout_constraintEnd_toEndOf="parent"
 
         app:layout_constraintHorizontal_bias="0.497"
@@ -67,21 +67,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="409dp"
-        android:layout_height="1dp"
-        android:layout_marginBottom="128dp"
-        android:background="?android:attr/listDivider"
+
+    <ImageView
+        android:id="@+id/iv_home"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.144"
+        app:srcCompat="@drawable/superhero1" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="205dp" />
+    <TextView
+        android:id="@+id/tv_info"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:text="정시 도착 도전 !!!"
+        android:textAlignment="center"
+        android:textColor="@color/colorButton"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.594" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

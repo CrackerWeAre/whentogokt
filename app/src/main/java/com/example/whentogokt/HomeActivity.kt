@@ -19,6 +19,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.example.whentogokt.Retrofit.OdsayAPI
 import com.example.whentogokt.Model.APIResponseModel
 import com.example.whentogokt.Utils.GpsTracker
@@ -32,14 +33,13 @@ import kotlinx.android.synthetic.main.activity_home.*
 import org.json.JSONObject
 import java.io.IOException
 import java.util.*
+import kotlin.collections.HashMap
 
 class HomeActivity : AppCompatActivity() {
 
     lateinit var compositeDisposable: CompositeDisposable
     private var gpsTracker: GpsTracker? = null
-    private var textView_Date: TextView? = null
     private var textView_Time: TextView? = null
-    private var dateCallbackMethod: DatePickerDialog.OnDateSetListener? = null
     private var timeCallbackMethod: TimePickerDialog.OnTimeSetListener? = null
 
     var latitude: Double = 0.0
@@ -75,15 +75,7 @@ class HomeActivity : AppCompatActivity() {
         // Daum 도로명주소 api
         ShowLocationButton.setOnClickListener(View.OnClickListener {
             val intent = Intent(this, DaumWebViewActivity::class.java)
-            startActivity(intent)
-            finish()
-
-            // TODO : intent 넘기기
-            var arg1 : String = intent.getStringExtra("arg1")
-            var arg2 : String = intent.getStringExtra("arg2")
-            var arg3 : String = intent.getStringExtra("arg3")
-
-            tv_gps.setText(String.format("(%s) %s %s", arg1, arg2, arg3))
+            startActivityForResult(intent, 1)
         })
 
         // Timezone 설정
@@ -141,18 +133,16 @@ class HomeActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.newThread())
                 .subscribe({ response: APIResponseModel ->
+
                     var idx = 0
                     for (item in response.resultList) {
                         idx++
                         println("index " +idx)
                         println(item.totaltime)
                         for (i in item.subPath){
-                            println(i.sectionTime)
-                            println(i.endName)
-                            println(i.name)
-                            println(i.startName)
+                             var subPathList = listOf(i.sectionTime,i.endName,i.name,i.startName)
                         }
-                    }
+                      }
 
                     // TODO : SelectActivity로 넘어가기
 
@@ -295,6 +285,19 @@ class HomeActivity : AppCompatActivity() {
                     }
                 }
         }
+        when (resultCode) {
+            RESULT_OK ->  // 정상 반환일 경우에만 동작하겠다
+                setAddress(data)
+        }
+    }
+
+    fun setAddress(intent:Intent?) {
+        var arg1: String? = intent?.getStringExtra("arg1")
+        var arg2: String? = intent?.getStringExtra("arg2")
+        var arg3: String? = intent?.getStringExtra("arg3")
+
+        var tv_gps : TextView = findViewById(R.id.tv_gps)
+        tv_gps.setText(String.format("(%s) %s %s", arg1, arg2, arg3))
     }
 
     fun checkLocationServicesStatus(): Boolean {

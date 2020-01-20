@@ -7,16 +7,44 @@
     tools:context=".NoResultActivity">
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/btn_retry"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:background="@color/colorButton"
         android:text="다시 검색하기"
         android:textColor="@color/white"
-        android:background="@color/colorButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.834" />
+        app:layout_constraintVertical_bias="0.888" />
+
+    <ImageView
+        android:id="@+id/iv_fail"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_retry"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.402"
+        app:srcCompat="@drawable/emoji" />
+
+    <TextView
+        android:id="@+id/tv_fail"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="4dp"
+        android:textSize="25dp"
+        android:textColor="@color/colorButton"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:text="시간 내에 \n 도착할 수 없어요."
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintBottom_toTopOf="@+id/btn_retry"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_fail" />
 </androidx.constraintlayout.widget.ConstraintLayout>

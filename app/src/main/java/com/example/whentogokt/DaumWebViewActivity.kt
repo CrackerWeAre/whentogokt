@@ -9,7 +9,6 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_daum.*
 
 
 class DaumWebViewActivity : AppCompatActivity() {
@@ -43,11 +42,12 @@ class DaumWebViewActivity : AppCompatActivity() {
     }
 
     fun sendResult(arg1: String?, arg2: String?, arg3: String?) {
-        val intent = Intent(this, HomeActivity::class.java)
+        val intent = getIntent()
+
         intent.putExtra("arg1",arg1)
         intent.putExtra("arg2",arg2)
         intent.putExtra("arg3",arg3)
-        startActivity(intent)
+        setResult(RESULT_OK, intent)
         finish()
     }
 
