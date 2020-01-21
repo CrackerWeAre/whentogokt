@@ -23,6 +23,8 @@ import androidx.core.content.ContextCompat.getSystemService
 import com.example.whentogokt.Retrofit.OdsayAPI
 import com.example.whentogokt.Model.APIResponseModel
 import com.example.whentogokt.Utils.GpsTracker
+import com.example.whentogokt.Utils.RecyclerAdapter
+import com.example.whentogokt.Utils.ResultItem
 import com.odsay.odsayandroidsdk.API
 import com.odsay.odsayandroidsdk.ODsayData
 import com.odsay.odsayandroidsdk.OnResultCallbackListener
@@ -30,6 +32,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.activity_select.*
 import org.json.JSONObject
 import java.io.IOException
 import java.util.*
@@ -37,7 +40,6 @@ import kotlin.collections.HashMap
 
 class HomeActivity : AppCompatActivity() {
 
-    lateinit var compositeDisposable: CompositeDisposable
     private var gpsTracker: GpsTracker? = null
     private var textView_Time: TextView? = null
     private var timeCallbackMethod: TimePickerDialog.OnTimeSetListener? = null
@@ -93,63 +95,13 @@ class HomeActivity : AppCompatActivity() {
             dialog.show()
         })
 
-        // API 호출 관련 Initialization
-        compositeDisposable = CompositeDisposable()
-
         // 검색 버튼 클릭
         var button_click : Button = findViewById(R.id.btn_search)
 
         button_click.setOnClickListener( View.OnClickListener {
-            //모든 정보가 유효한지 확인
-            //1. 시작지점
-            //2. 도착지점
-            //3. 출발시간
-            //4. 도착시간
-            //5. 이동수단(지하철)
-
-            // 모든 정보가 유효하다면
-            // api 호출
-
-            // 임시 파라미터
-            var sx = 127.03884584921066
-            var sy = 37.56460329171426
-            var ex = 127.05675385527476
-            var ey = 37.50724735841729
-            var opt = 0
-            var SearchType = 0
-            var SearchPathType = 0
-
-            val jsonParam = JSONObject()
-
-            jsonParam?.put("sx", sx.toString())
-            jsonParam?.put("sy", sy.toString())
-            jsonParam?.put("ex", ex.toString())
-            jsonParam?.put("ey", ey.toString())
-            jsonParam?.put("opt", opt.toString())
-            jsonParam?.put("SearchType", SearchType.toString())
-            jsonParam?.put("SearchPathType", SearchPathType.toString())
-
-            compositeDisposable.add(OdsayAPI.getRepoList(jsonParam)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.newThread())
-                .subscribe({ response: APIResponseModel ->
-
-                    var idx = 0
-                    for (item in response.resultList) {
-                        idx++
-                        println("index " +idx)
-                        println(item.totaltime)
-                        for (i in item.subPath){
-                             var subPathList = listOf(i.sectionTime,i.endName,i.name,i.startName)
-                        }
-                      }
-
-                    // TODO : SelectActivity로 넘어가기
-
-                }, { error: Throwable ->
-                    Log.d("MainActivity", error.localizedMessage)
-                    Toast.makeText(this, "Error ${error.localizedMessage}", Toast.LENGTH_SHORT).show()
-                }))
+            val intent = Intent(this, SelectActivity::class.java)
+            startActivity(intent)
+            finish()
         })
 
     }
@@ -322,9 +274,6 @@ class HomeActivity : AppCompatActivity() {
             }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.dispose()
-    }
+
 
 }

@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".OnTheWayActivity"></activity>
+        <activity android:name=".OnTheWayActivity" />
         <activity android:name=".NoResultActivity" />
         <activity android:name=".SelectActivity" />
         <activity android:name=".WhentogoActivity" />
@@ -25,6 +25,7 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity> <!-- Login -->
@@ -33,7 +34,6 @@
             android:label="@string/label_emailpassword"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- Daum -->
         <activity android:name=".DaumWebViewActivity" /> <!-- Main -->
-        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>
