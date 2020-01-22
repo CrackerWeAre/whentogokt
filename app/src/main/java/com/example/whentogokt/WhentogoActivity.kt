@@ -13,6 +13,7 @@ class WhentogoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_whentogo)
 
+        // TODO : 출발시간 표시
         val intent = Intent(this, SelectActivity::class.java)
         var time_start : String = intent.getStringExtra("time_start")
 
@@ -26,6 +27,7 @@ class WhentogoActivity : AppCompatActivity() {
             val intentToStartPage = Intent(this, OnTheWayActivity::class.java)
             startActivity(intentToStartPage)
             finish()
+            // TODO : 출발 로그
         })
 
 

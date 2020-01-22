@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class RetrofitCreator {
 
     companion object {
-        val API_BASE_URL = "http://180.68.35.60"
+        val API_BASE_URL = "http://180.68.35.60:8000"
 
         private fun defaultRetrofit(): Retrofit {
             return Retrofit.Builder()
